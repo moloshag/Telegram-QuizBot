@@ -22,10 +22,22 @@ public class QuestionAndAnswer implements Serializable{
     @Column(name = "answer")
     private String answer;
 
-    public QuestionAndAnswer(long id, String question, String answer) {
+    @Column(name = "comment")
+    private String comment;
+
+    public QuestionAndAnswer(long id, String question, String answer, String comment) {
         this.id = id;
         this.question = question;
         this.answer = answer;
+        this.comment = comment;
+    }
+
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
     }
 
     public QuestionAndAnswer(){}

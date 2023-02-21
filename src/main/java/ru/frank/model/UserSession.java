@@ -25,11 +25,23 @@ public class UserSession implements Serializable {
     @Column(name = "answer")
     private String answer;
 
-    public UserSession(Long id, String startTime, String question, String answer) {
+    @Column(name = "comment")
+    private String comment;
+
+    public UserSession(Long id, String startTime, String question, String answer, String comment) {
         this.id = id;
         this.startTime = startTime;
         this.question = question;
         this.answer = answer;
+        this.comment = comment;
+    }
+
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
     }
 
     public UserSession() {}

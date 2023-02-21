@@ -6,9 +6,11 @@ import ru.frank.dataBaseUtil.userScore.UserScoreDao;
 import ru.frank.exceptions.UserScoreListIsEmptyException;
 import ru.frank.model.UserScore;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Класс для обработки событий связанных с чтением, изменением, дополнением
@@ -29,12 +31,32 @@ public class UserScoreHandler {
         return userScoreDao.get(userId) != null;
     }
 
+    public UserScore get(Long userId) {
+        return userScoreDao.get(userId);
+    }
+
+    public void updateFinishTime(Long userId) {
+        UserScore userScore = userScoreDao.get(userId);
+        if (Objects.nonNull(userScore.getEndTime())) {
+            return;
+        }
+        LocalDateTime startTime = userScore.getStartTime();
+        LocalDateTime finishTime = LocalDateTime.now();
+        int startMinute = startTime.getMinute();
+        int startSec = startTime.getSecond();
+        int finishMinute = finishTime.getMinute();
+        int finishSecond = finishTime.getSecond();
+
+        userScore.setEndTime((finishMinute-startMinute) + " мин., " + Math.abs(finishSecond-startSec) + " сек.");
+        userScoreDao.update(userScore);
+    }
+
     /**
      * Метод добавляет новую запись в таблицу
      * @param userId
      */
     public void addNewUserInChart(long userId, String userName){
-        userScoreDao.save(new UserScore(userId, userName, 0));
+        userScoreDao.save(new UserScore(userId, userName, 0, LocalDateTime.now()));
     }
 
     public long incrementUserScore(long userId){
@@ -44,35 +66,21 @@ public class UserScoreHandler {
         return userScore.getScore();
     }
 
+    public void nullingScore(long userId) {
+        UserScore userScore = userScoreDao.get(userId);
+        userScore.setScore(0);
+        userScore.setStartTime(LocalDateTime.now());
+        userScoreDao.update(userScore);
+    }
+
     public long getUserScoreById(long userId){
         return userScoreDao.get(userId).getScore();
     }
-    
-    /**
-     * ArrayList include top 5 or less UserSco
-     * @return
-     */
-    public List<UserScore> getTopFiveUserScore() {
-        ArrayList<UserScore> userScoreArrayList = new ArrayList<>(userScoreDao.getAll());
 
-        if(userScoreArrayList.isEmpty()){
-            throw new UserScoreListIsEmptyException("User score list is empty.");
-        }
-
-        Collections.sort(userScoreArrayList);
-
-        int userScoreListSize = userScoreArrayList.size();
-
-        List<UserScore> topScoreList;
-
-        if(userScoreListSize < 5){
-            topScoreList = new ArrayList<>(userScoreArrayList.subList(0, userScoreListSize));
-        } else{
-            topScoreList = new ArrayList<>(userScoreArrayList.subList(0, 5));
-        }
-
-        return topScoreList;
-
+    public List<UserScore> getUserScore() {
+        return userScoreDao.getAll().stream()
+                .sorted(Comparator.comparing(UserScore::getScore).reversed())
+                .collect(Collectors.toList());
     }
 
 }

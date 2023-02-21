@@ -1,9 +1,15 @@
 package ru.frank.bot.botUtils;
 
+import org.aspectj.weaver.patterns.TypePatternQuestions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.frank.dataBaseUtil.QuestionAndAnswerDao;
+import ru.frank.dataBaseUtil.UserQuestionAndAnswerDao;
 import ru.frank.model.QuestionAndAnswer;
+import ru.frank.model.UserQuestionAndAnswer;
+
+import java.util.List;
+import java.util.Optional;
 
 /**
  * Класс для получения объекта класса
@@ -17,6 +23,8 @@ public class QuestionAnswerGenerator {
 
     @Autowired
     private QuestionAndAnswerDao questionAndAnswerDao;
+    @Autowired
+    private UserQuestionAndAnswerDao userQuestionAndAnswerDao;
 
     /**
      * Генерирует случайное число от 1 до Maximum ID из БД
@@ -53,6 +61,24 @@ public class QuestionAnswerGenerator {
         QuestionAndAnswer questionAndAnswer = getRandomQuestionAndAnswer();
         sb.append(questionAndAnswer.getQuestion()).append("|").append(questionAndAnswer.getAnswer());
         return sb.toString();
+    }
+
+    public String getRandomUserQuestion(Long userId) {
+       UserQuestionAndAnswer questionAndAnswer = userQuestionAndAnswerDao.getAllByUser(userId).stream().findFirst().orElse(null);
+       if (questionAndAnswer != null) {
+           StringBuilder sb = new StringBuilder();
+           sb.append(questionAndAnswer.getQuestion())
+                   .append("|")
+                   .append(questionAndAnswer.getAnswer())
+                   .append("|")
+                   .append(questionAndAnswer.getComment());
+           return sb.toString();
+       }
+       return "";
+    }
+
+    public List<QuestionAndAnswer> getAll() {
+        return questionAndAnswerDao.getAll();
     }
 
 }

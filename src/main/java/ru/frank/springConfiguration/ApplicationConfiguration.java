@@ -2,7 +2,9 @@ package ru.frank.springConfiguration;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.telegram.telegrambots.TelegramBotsApi;
+import org.telegram.telegrambots.meta.TelegramBotsApi;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 import ru.frank.bot.botUtils.QuestionAnswerGenerator;
 import ru.frank.bot.botUtils.UserScoreHandler;
 import ru.frank.bot.botUtils.UserSessionHandler;
@@ -42,7 +44,7 @@ public class ApplicationConfiguration {
 
 
     @Bean
-    public TelegramBotsApi telegramBotsApi(){
-        return new TelegramBotsApi();
+    public TelegramBotsApi telegramBotsApi() throws TelegramApiException {
+        return new TelegramBotsApi(DefaultBotSession.class);
     }
 }

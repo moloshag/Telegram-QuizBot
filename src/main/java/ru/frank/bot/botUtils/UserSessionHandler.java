@@ -9,6 +9,7 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
+import java.util.List;
 
 @Component
 public class UserSessionHandler {
@@ -30,8 +31,9 @@ public class UserSessionHandler {
         String [] questionAndAnswerArray = questionAndAnswer.split("\\|");
         String question = questionAndAnswerArray[0];
         String answer = questionAndAnswerArray[1];
+        String comment = questionAndAnswerArray[2];
         LocalDateTime dateTime = LocalDateTime.now();
-        userSessionDao.save(new UserSession(userId, dateTime.format(formatter), question, answer));
+        userSessionDao.save(new UserSession(userId, dateTime.format(formatter), question, answer, comment));
     }
 
     public String getQuestionAndAnswerFromDB(long userId){
@@ -44,6 +46,18 @@ public class UserSessionHandler {
     public String getAnswerFromSession(long userId){
         UserSession userSession = userSessionDao.get(userId);
         return userSession.getAnswer();
+    }
+
+    public String getQuestionFromSession(long userId){
+        UserSession userSession = userSessionDao.get(userId);
+        if (userSession == null) {
+            return null;
+        }
+        return userSession.getQuestion();
+    }
+
+    public UserSession get(long userId) {
+        return userSessionDao.get(userId);
     }
 
     public void deleteUserSession(long userId){
@@ -67,9 +81,5 @@ public class UserSessionHandler {
         LocalDateTime dateTimeFromSession = LocalDateTime.parse(getDateFromSession(userId), formatter);
         return currentDate.isBefore(dateTimeFromSession.plusSeconds(20));
     }
-
-
-
-
 
 }
